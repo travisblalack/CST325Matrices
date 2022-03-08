@@ -95,7 +95,7 @@ Matrix4.prototype = {
 		if (!(rightSideMatrix instanceof Matrix4)) {
 			console.error("Trying to multiply a 4x4 matrix with an invalid matrix value");
 		}
-		var result = new Matrix4();
+		
 		var te = this.elements;
 		var oe = rightSideMatrix.elements;
 		var m11 = te[0] * oe[0]+ te[1] * oe[4] + te[2] * oe[8] + te[3] * oe[12];
@@ -122,6 +122,7 @@ Matrix4.prototype = {
 
 	// -------------------------------------------------------------------------
 	premultiply: function(leftSideMatrix) {
+		
 		// ignore this, the implementation will be distributed with the solution
 		return this;
 	},
@@ -129,6 +130,13 @@ Matrix4.prototype = {
 	// -------------------------------------------------------------------------
 	makeScale: function(x, y, z) {
 		// todo make this matrix into a pure scale matrix based on (x, y, z)
+		
+		var e = this.elements;
+		e[0] = x; e[1] = 0; e[2] = 0; e[3] = 0;
+		e[4] = 0; e[5] = y; e[6] = 0; e[7] = 0;
+		e[8] = 0; e[9] = 0; e[10] = z; e[11] = 0;
+		e[12] = 0; e[13] = 0; e[14] = 0; e[15] = 1;
+	
 		return this;
 	},
 
@@ -136,9 +144,17 @@ Matrix4.prototype = {
 	makeRotationX: function(degrees) {
 		// todo - convert to radians
 		// var radians = ...
-
+          
 		// shortcut - use in place of this.elements
+		var rad = degrees * Math.PI/180;
 		var e = this.elements;
+		var s = Math.sin(rad);
+		var c = Math.cos(rad);
+      // ignore bottom row and last column
+		e[0] = 1; e[1] = 0; e[2] = 0; e[3] = 0;
+		e[4] = 0; e[5] = c; e[6] = -s; e[7] = 0;
+		e[8] = 0; e[9] = s; e[10] = c; e[11] = 0;
+		e[12] = 0; e[13] = 0; e[14] = 0; e[15] = 1;
 
 		// todo - set every element of this matrix to be a rotation around the x-axis
 
@@ -151,7 +167,15 @@ Matrix4.prototype = {
 		// var radians = ...
 
 		// shortcut - use in place of this.elements
+		var rad = degrees * Math.PI/180;
 		var e = this.elements;
+		var s = Math.sin(rad);
+		var c = Math.cos(rad);
+      // ignore bottom row and last column
+		e[0] = c; e[1] = 0; e[2] = s; e[3] = 0;
+		e[4] = 0; e[5] = 1; e[6] = 0; e[7] = 0;
+		e[8] = -s; e[9] = 0; e[10] = c; e[11] = 0;
+		e[12] = 0; e[13] = 0; e[14] = 0; e[15] = 1;
 
 		// todo - set every element of this matrix to be a rotation around the y-axis
 
@@ -163,24 +187,48 @@ Matrix4.prototype = {
 		// todo - convert to radians
 		// var radians = ...
 
-		// shortcut - use in place of this.elements
+			// shortcut - use in place of this.elements
+		var rad = degrees * Math.PI/180;
 		var e = this.elements;
+		var s = Math.sin(rad);
+		var c = Math.cos(rad);
+      // ignore bottom row and last column
+		e[0] = c; e[1] = -s; e[2] = 0; e[3] = 0;
+		e[4] = s; e[5] = c; e[6] = 0; e[7] = 0;
+		e[8] = 0; e[9] = 0; e[10] = 1; e[11] = 0;
+		e[12] = 0; e[13] = 0; e[14] = 0; e[15] = 1;
 
-		// todo - set every element of this matrix to be a rotation around the z-axis
+		// todo - set every element of this matrix to be a rotation around the y-axis
+
 		return this;
 	},
+	
 
 	// -------------------------------------------------------------------------
 	makeTranslation: function(arg1, arg2, arg3) {
 		// todo - wipe out the existing matrix and make it a pure translation
 		//      - If arg1 is a Vector3 or Vector4, use its components and ignore
+		
 		//        arg2 and arg3. O.W., treat arg1 as x, arg2 as y, and arg3 as z
+		
+		var e= this.elements;
+
 		if (arg1 instanceof Vector4) {
+			e[0] = 1; e[1] = 0; e[2] = 0; e[3] = arg1.x;
+			e[4] = 0; e[5] = 1; e[6] = 0; e[7] = arg1.y;
+			e[8] = 0; e[9] = 0; e[10] = 1; e[11] = arg1.z;
+			e[12] = 0; e[13] = 0; e[14] = 0; e[15] = arg1.w;
 			//...
 		} else if (arg1 instanceof Vector3) {
-			//...
+			e[0] = 1; e[1] = 0; e[2] = 0; e[3] = arg1.x;
+			e[4] = 0; e[5] = 1; e[6] = 0; e[7] = arg1.y;
+			e[8] = 0; e[9] = 0; e[10] = 1; e[11] = arg1.z;
+			e[12] = 0; e[13] = 0; e[14] = 0; e[15] = 1;
 		} else {
-			//...
+			e[0] = 1; e[1] = 0; e[2] = 0; e[3] = arg1;
+			e[4] = 0; e[5] = 1; e[6] = 0; e[7] = arg2;
+			e[8] = 0; e[9] = 0; e[10] = 1; e[11] = arg3;
+			e[12] = 0; e[13] = 0; e[14] = 0; e[15] = 1;
 		}
 		return this;
 	},
