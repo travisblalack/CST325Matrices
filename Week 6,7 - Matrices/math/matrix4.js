@@ -185,7 +185,7 @@ Matrix4.prototype = {
 	// -------------------------------------------------------------------------
 	makeRotationZ: function(degrees) {
 		// todo - convert to radians
-		// var radians = ...
+		// var rad = ...
 
 			// shortcut - use in place of this.elements
 		var rad = degrees * Math.PI/180;
@@ -237,11 +237,21 @@ Matrix4.prototype = {
 	makePerspective: function(fovy, aspect, near, far) {
 		// todo - convert fovy to radians
 		// var fovyRads = ...
-
+		   var fovyRads =  (Math.PI/180)*fovy;
+		   var t = near * Math.tan(fovyRads/2);
+		   var r = t * aspect;
 		// todo -compute t (top) and r (right)
-
+	
 		// shortcut - use in place of this.elements
+		 
 		var e = this.elements;
+		
+
+		e[0] = near/r; e[1] = 0; e[2] = 0; e[3] = 0;
+		e[4] = 0; e[5] = near/t; e[6] = 0; e[7] = 0;
+		e[8] = 0; e[9] = 0; e[10] = -(far+near)/(far-near); e[11] = (-2*near*far)/(far-near);
+		e[12] = 0; e[13] = 0; e[14] = -1; e[15] = 0;
+		
 
 		// todo - set every element to the appropriate value
 
@@ -254,6 +264,10 @@ Matrix4.prototype = {
 		var e = this.elements;
 
 		// todo - set every element to the appropriate value
+		e[0] = 2/(right - left); e[1] = 0; e[2] = 0; e[3] = -1 * ((right + left)/ (right - left));
+		e[4] = 0; e[5] = 2/(top - bottom); e[6] = 0; e[7] = -1 * ((top + bottom)/ (top - bottom));
+		e[8] = 0; e[9] = 0; e[10] = -2 /(far-near); e[11] = -1 * ((far + near ) /(far - near));
+		e[12] = 0; e[13] = 0; e[14] = 0; e[15] = 1;
 
 		return this;
 	},
@@ -269,11 +283,16 @@ Matrix4.prototype = {
 
 		// Note: Do NOT change earthWorldMatrix but do use it, it already contains the rotation and translation for the earth
 
-		var moonMatrix = new Matrix4();
-
+		var moonMatrix = new Matrix4().makeRotationZ(moonRotationAngle);
+		var moonMatrix1 = new Matrix4().makeTranslation(offsetFromEarth);
+		earthWorldMatrix.multiply(moonMatrix).multiply(moonMatrix1);
+		
+		
+        
+	    
 		// todo - create and combine all necessary matrices necessary to achieve the desired effect
 
-		return moonMatrix;
+		return earthWorldMatrix;
 	},
 
 	// -------------------------------------------------------------------------
